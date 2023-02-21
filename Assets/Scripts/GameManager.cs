@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
     public static bool gameStarted;
 
+    public Player player;
     public GameObject pulpitPrefab;
     public int maxPulpits = 2;
     public float spawnInterval = 2.5f;
@@ -27,15 +29,16 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gameStarted = true;
+        gameStarted = false;
         pulpits = new Pulpit[maxPulpits];
 
         for (int i = 0; i < maxPulpits; i++)
         {
             pulpits[i] = Instantiate(pulpitPrefab, transform.position, transform.rotation).GetComponent<Pulpit>();
         }
-        pulpitIndex = 0;
-        nextPulpit = pulpits[0];
+        pulpitIndex = 1;
+        pulpits[0].SpawnPulpit(Vector3.zero);
+        nextPulpit = pulpits[1];
 
         nextPositions = new Vector3[4];
         nextPositions[0] = new Vector3(9f, 0f, 0f);
@@ -51,6 +54,11 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Keyboard kb = InputSystem.GetDevice<Keyboard>();
+        if (kb.spaceKey.wasPressedThisFrame)
+        {
+            StartGame();
+        }
         if (gameStarted)
         {
             spawnTime -= Time.deltaTime;
@@ -64,7 +72,7 @@ public class GameManager : MonoBehaviour
 
                 nextPulpit = pulpits[pulpitIndex];
 
-                Debug.Log(nextPulpit.transform.position);
+                //Debug.Log(nextPulpit.transform.position);
 
                 spawnTime = spawnInterval;
             }
@@ -73,6 +81,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
-
+        player.enabled = true;
+        gameStarted = true;
     }
 }

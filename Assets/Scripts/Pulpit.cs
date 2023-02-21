@@ -23,20 +23,24 @@ public class Pulpit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (destroyTime > 0f)
+        if (GameManager.gameStarted)
         {
-            destroyTime -= Time.deltaTime;
-            destroyTimeText.text = destroyTime.ToString("F2");
+            if (destroyTime > 0f)
+            {
+                destroyTime -= Time.deltaTime;
+                destroyTimeText.text = destroyTime.ToString("F2");
+            }
+            else
+                DestroyPulpit();
         }
-        else
-            DestroyPulpit();
     }
 
     public void SpawnPulpit(Vector3 spawnPosition)
     {
         transform.position = spawnPosition;
         destroyTime = Random.Range(minDestroyTime, maxDestroyTime);
-        Debug.Log($"Pulpit Time: {destroyTime.ToString("F2")}");
+        destroyTimeText.text = destroyTime.ToString("F2");
+        //Debug.Log($"Pulpit Time: {destroyTime.ToString("F2")}");
         gameObject.SetActive(true);
     }
 
