@@ -1,14 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public static bool gameStarted;
+    public CanvasGroup startUI;
+    public CanvasGroup gameUI;
+    public CanvasGroup endUI;
+
+    public bool gameStarted;
+    public int gameScore;
 
     public Player player;
     public GameObject pulpitPrefab;
+    public TextMeshProUGUI scoreText;
     public int maxPulpits = 2;
     public float spawnInterval = 2.5f;
 
@@ -20,12 +24,6 @@ public class GameManager : MonoBehaviour
 
     private float spawnTime = 0f;
 
-
-    private void Awake()
-    {
-        
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -36,41 +34,33 @@ public class GameManager : MonoBehaviour
         {
             pulpits[i] = Instantiate(pulpitPrefab, transform.position, transform.rotation).GetComponent<Pulpit>();
         }
-        pulpitIndex = 1;
-        pulpits[0].SpawnPulpit(Vector3.zero);
-        nextPulpit = pulpits[1];
+        pulpitIndex = 0;
+        nextPulpit = pulpits[pulpitIndex];
 
         nextPositions = new Vector3[4];
-        nextPositions[0] = new Vector3(9f, 0f, 0f);
-        nextPositions[1] = new Vector3(0f, 0f, 9f);
-        nextPositions[2] = new Vector3(0f, 0f, -9f);
-        nextPositions[3] = new Vector3(-9f, 0f, 0f);
+        nextPositions[0] = new Vector3(9.2f, 0f, 0f);
+        nextPositions[1] = new Vector3(0f, 0f, 9.2f);
+        nextPositions[2] = new Vector3(0f, 0f, -9.2f);
+        nextPositions[3] = new Vector3(-9.2f, 0f, 0f);
 
-        nextPulpitPosition = new Vector3(0f, 0f, 0f);
-
-        spawnTime = spawnInterval;
+        nextPulpitPosition = Vector3.zero;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Keyboard kb = InputSystem.GetDevice<Keyboard>();
-        if (kb.spaceKey.wasPressedThisFrame)
-        {
-            StartGame();
-        }
         if (gameStarted)
         {
             spawnTime -= Time.deltaTime;
             if (spawnTime <= 0f)
             {
-                Debug.Log("Spawn");
-                nextPulpit.SpawnPulpit(nextPositions[pulpitIndex]);
+                nextPulpit.SpawnPulpit(nextPulpitPosition);
 
                 pulpitIndex += 1;
-                pulpitIndex = pulpitIndex % maxPulpits;
+                pulpitIndex %= maxPulpits;
 
                 nextPulpit = pulpits[pulpitIndex];
+                nextPulpitPosition += nextPositions[Random.Range(0, 4)];
 
                 //Debug.Log(nextPulpit.transform.position);
 
@@ -81,7 +71,49 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        startUI.alpha = 0f;
+        startUI.blocksRaycasts = false;
+
+        gameScore = 0;
+        scoreText.text = $"Score: {gameScore}";
+        gameUI.alpha = 1f;
+
         player.enabled = true;
         gameStarted = true;
+    }
+
+    public void EndGame()
+    {
+        endUI.alpha = 1f;
+        endUI.blocksRaycasts = true;
+
+        player.enabled = false;
+        gameStarted = false;
+    }
+
+    public void RestartGame()
+    {
+        endUI.alpha = 0f;
+        endUI.blocksRaycasts = false;
+
+        foreach (Pulpit pulpit in pulpits)
+            pulpit.gameObject.SetActive(false);
+        pulpitIndex = 0;
+        nextPulpit = pulpits[pulpitIndex];
+        spawnTime = 0f;
+        nextPulpitPosition = new Vector3(0f, 0f, 0f);
+
+        gameScore = 0;
+        scoreText.text = $"Score: {gameScore}";
+        gameUI.alpha = 1f;
+
+        player.enabled = true;
+        gameStarted = true;
+    }
+
+    public void UpdateScore()
+    {
+        gameScore += 1;
+        scoreText.text = $"Score: {gameScore}";
     }
 }

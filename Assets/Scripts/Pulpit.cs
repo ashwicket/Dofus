@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -10,20 +8,27 @@ public class Pulpit : MonoBehaviour
     public float minDestroyTime = 4f;
     public float maxDestroyTime = 5f;
 
-    private float destroyTime;
+    private GameManager gameManager;
 
-    public float DestroyTime { get { return destroyTime; } }
+    private float destroyTime;
+    private bool scoreCounted;
+    private readonly string playerTag = "Player";
+
+    private void Awake()
+    {
+        gameManager = FindObjectOfType<GameManager>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-
+        scoreCounted = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.gameStarted)
+        if (gameManager.gameStarted)
         {
             if (destroyTime > 0f)
             {
@@ -31,21 +36,28 @@ public class Pulpit : MonoBehaviour
                 destroyTimeText.text = destroyTime.ToString("F2");
             }
             else
-                DestroyPulpit();
+                gameObject.SetActive(false);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!scoreCounted)
+        {
+            if (collision.gameObject.CompareTag(playerTag))
+            {
+                gameManager.UpdateScore();
+                scoreCounted = true;
+            }
         }
     }
 
     public void SpawnPulpit(Vector3 spawnPosition)
     {
+        scoreCounted = false;
         transform.position = spawnPosition;
         destroyTime = Random.Range(minDestroyTime, maxDestroyTime);
         destroyTimeText.text = destroyTime.ToString("F2");
-        //Debug.Log($"Pulpit Time: {destroyTime.ToString("F2")}");
         gameObject.SetActive(true);
-    }
-
-    private void DestroyPulpit()
-    {
-        gameObject.SetActive(false);
     }
 }
