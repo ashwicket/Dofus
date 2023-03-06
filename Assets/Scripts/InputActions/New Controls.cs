@@ -15,12 +15,14 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
 
-public partial class @NewControls: IInputActionCollection2, IDisposable
+namespace InputActions
 {
-    public InputActionAsset asset { get; }
-    public @NewControls()
+    public partial class @NewControls : IInputActionCollection2, IDisposable
     {
-        asset = InputActionAsset.FromJson(@"{
+        public InputActionAsset asset { get; }
+        public @NewControls()
+        {
+            asset = InputActionAsset.FromJson(@"{
     ""name"": ""New Controls"",
     ""maps"": [
         {
@@ -32,7 +34,7 @@ public partial class @NewControls: IInputActionCollection2, IDisposable
                     ""type"": ""Value"",
                     ""id"": ""c1096a13-9446-4069-82be-92f81eddebaa"",
                     ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
+                    ""processors"": ""NormalizeVector2"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 }
@@ -41,9 +43,9 @@ public partial class @NewControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""Arrows"",
                     ""id"": ""2c4b4312-19ca-49c8-a08c-4899b1666f00"",
-                    ""path"": ""2DVector(mode=1)"",
+                    ""path"": ""2DVector"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""NormalizeVector2"",
                     ""groups"": """",
                     ""action"": ""Movement"",
                     ""isComposite"": true,
@@ -107,9 +109,9 @@ public partial class @NewControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""WASD"",
                     ""id"": ""6727e9e7-641c-4c35-91cf-d8fc09dfc998"",
-                    ""path"": ""2DVector(mode=1)"",
+                    ""path"": ""2DVector"",
                     ""interactions"": """",
-                    ""processors"": """",
+                    ""processors"": ""NormalizeVector2"",
                     ""groups"": """",
                     ""action"": ""Movement"",
                     ""isComposite"": true,
@@ -176,123 +178,124 @@ public partial class @NewControls: IInputActionCollection2, IDisposable
         }
     ]
 }");
+            // Player Input
+            m_PlayerInput = asset.FindActionMap("Player Input", throwIfNotFound: true);
+            m_PlayerInput_Movement = m_PlayerInput.FindAction("Movement", throwIfNotFound: true);
+        }
+
+        public void Dispose()
+        {
+            UnityEngine.Object.Destroy(asset);
+        }
+
+        public InputBinding? bindingMask
+        {
+            get => asset.bindingMask;
+            set => asset.bindingMask = value;
+        }
+
+        public ReadOnlyArray<InputDevice>? devices
+        {
+            get => asset.devices;
+            set => asset.devices = value;
+        }
+
+        public ReadOnlyArray<InputControlScheme> controlSchemes => asset.controlSchemes;
+
+        public bool Contains(InputAction action)
+        {
+            return asset.Contains(action);
+        }
+
+        public IEnumerator<InputAction> GetEnumerator()
+        {
+            return asset.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public void Enable()
+        {
+            asset.Enable();
+        }
+
+        public void Disable()
+        {
+            asset.Disable();
+        }
+
+        public IEnumerable<InputBinding> bindings => asset.bindings;
+
+        public InputAction FindAction(string actionNameOrId, bool throwIfNotFound = false)
+        {
+            return asset.FindAction(actionNameOrId, throwIfNotFound);
+        }
+
+        public int FindBinding(InputBinding bindingMask, out InputAction action)
+        {
+            return asset.FindBinding(bindingMask, out action);
+        }
+
         // Player Input
-        m_PlayerInput = asset.FindActionMap("Player Input", throwIfNotFound: true);
-        m_PlayerInput_Movement = m_PlayerInput.FindAction("Movement", throwIfNotFound: true);
-    }
-
-    public void Dispose()
-    {
-        UnityEngine.Object.Destroy(asset);
-    }
-
-    public InputBinding? bindingMask
-    {
-        get => asset.bindingMask;
-        set => asset.bindingMask = value;
-    }
-
-    public ReadOnlyArray<InputDevice>? devices
-    {
-        get => asset.devices;
-        set => asset.devices = value;
-    }
-
-    public ReadOnlyArray<InputControlScheme> controlSchemes => asset.controlSchemes;
-
-    public bool Contains(InputAction action)
-    {
-        return asset.Contains(action);
-    }
-
-    public IEnumerator<InputAction> GetEnumerator()
-    {
-        return asset.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    public void Enable()
-    {
-        asset.Enable();
-    }
-
-    public void Disable()
-    {
-        asset.Disable();
-    }
-
-    public IEnumerable<InputBinding> bindings => asset.bindings;
-
-    public InputAction FindAction(string actionNameOrId, bool throwIfNotFound = false)
-    {
-        return asset.FindAction(actionNameOrId, throwIfNotFound);
-    }
-
-    public int FindBinding(InputBinding bindingMask, out InputAction action)
-    {
-        return asset.FindBinding(bindingMask, out action);
-    }
-
-    // Player Input
-    private readonly InputActionMap m_PlayerInput;
-    private List<IPlayerInputActions> m_PlayerInputActionsCallbackInterfaces = new List<IPlayerInputActions>();
-    private readonly InputAction m_PlayerInput_Movement;
-    public struct PlayerInputActions
-    {
-        private @NewControls m_Wrapper;
-        public PlayerInputActions(@NewControls wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Movement => m_Wrapper.m_PlayerInput_Movement;
-        public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PlayerInputActions set) { return set.Get(); }
-        public void AddCallbacks(IPlayerInputActions instance)
+        private readonly InputActionMap m_PlayerInput;
+        private List<IPlayerInputActions> m_PlayerInputActionsCallbackInterfaces = new List<IPlayerInputActions>();
+        private readonly InputAction m_PlayerInput_Movement;
+        public struct PlayerInputActions
         {
-            if (instance == null || m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Add(instance);
-            @Movement.started += instance.OnMovement;
-            @Movement.performed += instance.OnMovement;
-            @Movement.canceled += instance.OnMovement;
-        }
+            private @NewControls m_Wrapper;
+            public PlayerInputActions(@NewControls wrapper) { m_Wrapper = wrapper; }
+            public InputAction @Movement => m_Wrapper.m_PlayerInput_Movement;
+            public InputActionMap Get() { return m_Wrapper.m_PlayerInput; }
+            public void Enable() { Get().Enable(); }
+            public void Disable() { Get().Disable(); }
+            public bool enabled => Get().enabled;
+            public static implicit operator InputActionMap(PlayerInputActions set) { return set.Get(); }
+            public void AddCallbacks(IPlayerInputActions instance)
+            {
+                if (instance == null || m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Add(instance);
+                @Movement.started += instance.OnMovement;
+                @Movement.performed += instance.OnMovement;
+                @Movement.canceled += instance.OnMovement;
+            }
 
-        private void UnregisterCallbacks(IPlayerInputActions instance)
-        {
-            @Movement.started -= instance.OnMovement;
-            @Movement.performed -= instance.OnMovement;
-            @Movement.canceled -= instance.OnMovement;
-        }
+            private void UnregisterCallbacks(IPlayerInputActions instance)
+            {
+                @Movement.started -= instance.OnMovement;
+                @Movement.performed -= instance.OnMovement;
+                @Movement.canceled -= instance.OnMovement;
+            }
 
-        public void RemoveCallbacks(IPlayerInputActions instance)
-        {
-            if (m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Remove(instance))
-                UnregisterCallbacks(instance);
-        }
+            public void RemoveCallbacks(IPlayerInputActions instance)
+            {
+                if (m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
 
-        public void SetCallbacks(IPlayerInputActions instance)
-        {
-            foreach (var item in m_Wrapper.m_PlayerInputActionsCallbackInterfaces)
-                UnregisterCallbacks(item);
-            m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Clear();
-            AddCallbacks(instance);
+            public void SetCallbacks(IPlayerInputActions instance)
+            {
+                foreach (var item in m_Wrapper.m_PlayerInputActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_PlayerInputActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
         }
-    }
-    public PlayerInputActions @PlayerInput => new PlayerInputActions(this);
-    private int m_NewcontrolschemeSchemeIndex = -1;
-    public InputControlScheme NewcontrolschemeScheme
-    {
-        get
+        public PlayerInputActions @PlayerInput => new PlayerInputActions(this);
+        private int m_NewcontrolschemeSchemeIndex = -1;
+        public InputControlScheme NewcontrolschemeScheme
         {
-            if (m_NewcontrolschemeSchemeIndex == -1) m_NewcontrolschemeSchemeIndex = asset.FindControlSchemeIndex("New control scheme");
-            return asset.controlSchemes[m_NewcontrolschemeSchemeIndex];
+            get
+            {
+                if (m_NewcontrolschemeSchemeIndex == -1) m_NewcontrolschemeSchemeIndex = asset.FindControlSchemeIndex("New control scheme");
+                return asset.controlSchemes[m_NewcontrolschemeSchemeIndex];
+            }
         }
-    }
-    public interface IPlayerInputActions
-    {
-        void OnMovement(InputAction.CallbackContext context);
+        public interface IPlayerInputActions
+        {
+            void OnMovement(InputAction.CallbackContext context);
+        }
     }
 }

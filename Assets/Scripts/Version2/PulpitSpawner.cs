@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,13 +18,12 @@ namespace Version2
         void Start()
         {
             spawnPositions = new Vector3[4];
-            spawnPositions[0] = new Vector3(0.0f, 0.0f, 9.0f);
-            spawnPositions[1] = new Vector3(0.0f, 0.0f, -9.0f);
-            spawnPositions[2] = new Vector3(9.0f, 0.0f, 0.0f);
-            spawnPositions[3] = new Vector3(-9.0f, 0.0f, 0.0f);
+            spawnPositions[0] = new Vector3(0.0f, 0.0f, 9.2f);
+            spawnPositions[1] = new Vector3(0.0f, 0.0f, -9.2f);
+            spawnPositions[2] = new Vector3(9.2f, 0.0f, 0.0f);
+            spawnPositions[3] = new Vector3(-9.2f, 0.0f, 0.0f);
 
             nextSpawnPosition = transform.position;
-            Debug.Log(pulpitQueue.Count > 0);
             SpawnPulpit();
         }
 

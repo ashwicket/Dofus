@@ -1,4 +1,5 @@
 using UnityEngine;
+using InputActions;
 
 namespace Version1
 {

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Version2
@@ -29,8 +27,7 @@ namespace Version2
         {
             pulpitTime -= Time.deltaTime;
 
-            if (pulpitTime <= 0f)
-                DestroyPulpit();
+            if (pulpitTime <= 0f) DestroyPulpit();
         }
 
         public void ResetTimer()
