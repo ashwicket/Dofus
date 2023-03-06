@@ -20,7 +20,7 @@ namespace Version2
         {
             Vector3 movePosition = moveSpeed * Time.deltaTime *
                 (playerInputs != null ? playerInputs.MoveDirection : Vector3.zero);
-            Debug.Log(movePosition);
+
             transform.position += movePosition;
         }
     }
